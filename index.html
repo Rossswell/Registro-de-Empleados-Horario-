@@ -1092,8 +1092,13 @@ async function markTime(type) {
   try {
     const data = await api('markTime', { cedula: currentUser.cedula, type });
     if (data.ok) {
-      toast(`${type} registrada: ${data.time}`, 'success');
-      if (data.late) toast(`⚠ Llegada tarde (${data.lateMin} min)`, 'warning');
+      // ── Mostrar banner de tardanza ──────────────────
+      if (data.late && data.lateMin > 0) {
+        showLateAlert(data.lateMin, data.schedIn);
+      } else {
+        hideLateAlert();
+        toast(`${type} registrada a las ${data.time} ✓`, 'success');
+      }
       await loadTodayStatus(currentUser.cedula);
       await loadHistory(currentUser.cedula);
       msg.style.display = 'none';
@@ -1109,6 +1114,52 @@ async function markTime(type) {
       ? '<span class="icon">🟢</span><span style="font-size:1.1rem">Registrar Entrada</span><span class="label">Marca tu llegada</span>'
       : '<span class="icon">🔴</span><span style="font-size:1.1rem">Registrar Salida</span><span class="label">Marca tu partida</span>';
   }
+}
+
+function showLateAlert(minutes, schedIn) {
+  let banner = document.getElementById('late-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'late-banner';
+    banner.style.cssText = `
+      background: rgba(255,171,0,0.12);
+      border: 1px solid rgba(255,171,0,0.5);
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      animation: fadeIn .4s ease;
+    `;
+    // Insertar después del schedule-card
+    const schedCard = document.getElementById('schedule-card');
+    schedCard.parentNode.insertBefore(banner, schedCard.nextSibling);
+  }
+  const hrs  = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const timeStr = hrs > 0 ? `${hrs}h ${mins}min` : `${mins} minuto${mins!==1?'s':''}`;
+  banner.innerHTML = `
+    <span style="font-size:1.8rem;line-height:1">⚠️</span>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#ffab00;margin-bottom:4px">
+        Llegada tarde — ${timeStr} de retraso
+      </div>
+      <div style="font-size:0.82rem;color:rgba(255,171,0,0.75);line-height:1.5">
+        Tu horario de entrada era a las <strong>${schedIn || '--:--'}</strong>.
+        Este retraso ha sido registrado y notificado al administrador.
+      </div>
+    </div>
+    <button onclick="hideLateAlert()" style="
+      margin-left:auto; background:transparent; border:none;
+      color:rgba(255,171,0,0.5); cursor:pointer; font-size:1.2rem; line-height:1; padding:0 4px;
+    ">✕</button>
+  `;
+}
+
+function hideLateAlert() {
+  const b = document.getElementById('late-banner');
+  if (b) b.remove();
 }
 
 // ═══════════════════════════════════════

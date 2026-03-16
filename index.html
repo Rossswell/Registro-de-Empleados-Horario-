@@ -777,9 +777,6 @@ function toast(msg, type='success') {
 //  API CALL
 // ═══════════════════════════════════════
 async function api(action, params={}) {
-  if (!API_URL || API_URL === 'https://script.google.com/macros/s/AKfycbykM-fG6wa9J8No_0qNLoIAGLT7qgiE-np-XUFQrhuLx8_TBUiBgVW60arYWCw-aBNTjg/exec') {
-    throw new Error('La URL del Apps Script no está configurada en el archivo index.html');
-  }
   const url = new URL(API_URL);
   url.searchParams.set('action', action);
   Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));

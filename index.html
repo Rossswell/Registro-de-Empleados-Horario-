@@ -511,7 +511,7 @@
 // ─────────────────────────────────────────
 //  CONFIG
 // ─────────────────────────────────────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbwRvZFW6g7WH-WGgxZp4lItQMlKMCTZqIixx7XePg98rRKYxsGMH9o1OzCTb27AsAaTHA/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyjIC5X2I6DsOx-Cqe7hIx6tXfpjLrXZ1XII5bZ4Zw6bJt0gk8IZQcirnu525IEA9m8dQ/exec';
 
 let currentUser     = null;
 let currentSchedule = null;
@@ -1002,8 +1002,8 @@ function showEntryMessageModal(data) {
             onblur="this.style.borderColor='var(--border2)'"
           ></textarea>
           <div style="font-size:0.73rem; color:var(--muted); margin-top:5px">
-            Mensaje predeterminado si no escribes nada: <em>"${defaultMsg}"</em>
-          </div>
+          El mensaje siempre comenzará con: <em>"${defaultMsg}"</em> seguido de lo que escribas aquí.
+        </div>
         ` : `
           <div style="background:var(--surface2); border:1px solid var(--border);
                       border-radius:10px; padding:12px 15px;
@@ -1035,12 +1035,11 @@ async function confirmEntryMessage(defaultMsg, hasTextarea) {
   if (hasTextarea) {
     const ta = document.getElementById('entry-msg-text');
     const typed = (ta ? ta.value.trim() : '');
-    mensaje = typed || defaultMsg;
+    mensaje = typed ? `${defaultMsg} ${typed}` : defaultMsg;
   }
 
-  // Guardar en el sheet
   try {
-    await api('saveMensaje', { cedula: currentUser.cedula, mensaje });
+    await api('saveMensaje', { cedula: currentUser.cedula, tipo: 'Entrada', mensaje });
   } catch(e) {
     console.warn('No se pudo guardar el mensaje:', e);
   }
@@ -1104,7 +1103,7 @@ function showEarlyExitDialog(diffMin) {
           onblur="this.style.borderColor='var(--border2)'"
         ></textarea>
         <div style="font-size:0.73rem; color:var(--muted); margin-top:5px">
-          Si no escribes nada se guardará: <em>"Salida anticipada."</em>
+          El mensaje comenzará siempre con <em>"Salida anticipada."</em> seguido de lo que escribas.
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px">
@@ -1133,9 +1132,10 @@ function showEarlyExitDialog(diffMin) {
 
 async function confirmEarlyExit() {
   const ta     = document.getElementById('early-exit-reason');
-  const reason = (ta ? ta.value.trim() : '') || 'Salida anticipada.';
+  const typed  = (ta ? ta.value.trim() : '');
+  const defaultMsg = 'Salida anticipada.';
+  const reason = typed ? `${defaultMsg} ${typed}` : defaultMsg;
   closeEarlyExitDialog();
-  // Ejecutar salida con la razón guardada
   await markTime('Salida', true, reason);
 }
 

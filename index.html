@@ -494,7 +494,7 @@
 // ─────────────────────────────────────────
 //  CONFIG
 // ─────────────────────────────────────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbynOZ7FKfRddxllPzT8-YmbJqsgBHOQSGsvqvXZjfQ-feG6RgOz0-VBYVtGXEUkNBqZXg/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbx5ZvRgYliz5qB99H1BIpx0pcJSx0bRC_2n3AtdaNUB1le0unYKK3LNaJvt3Sa6Ahp7Lw/exec';
 
 let currentUser     = null;
 let currentSchedule = null;
@@ -743,16 +743,25 @@ async function loadTodayStatus(cedula) {
       entryTimestamp = Date.now();
       startElapsed();
       hideBlockBanner();
-      // Mostrar banner de tardanza si llegó tarde
-      if (data.late && data.lateMin > 0) {
-        showLateAlert(data.lateMin);
-      }
+      if (data.late && data.lateMin > 0) showLateAlert(data.lateMin);
+
     } else if (data.status === 'out') {
       dot.className = 's-dot';
       txt.textContent = `Entrada: ${data.entryTime}  →  Salida: ${data.exitTime}`;
+      // Ambos bloqueados — ya completó o salió anticipado, no puede volver a entrar hoy
       btnE.disabled = true;
       btnS.disabled = true;
+      document.getElementById('elapsed-wrap').style.display = 'none';
       hideBlockBanner();
+      // Mostrar mensaje informativo de que ya terminó su jornada
+      showBlockBanner('✅ Jornada completada', `Registraste tu salida a las <strong>${data.exitTime}</strong>. No puedes volver a registrar entrada hoy.`);
+      // Cambiar color del banner a neutro (info)
+      const b = document.getElementById('block-banner');
+      b.style.background    = 'rgba(0,212,255,0.06)';
+      b.style.borderColor   = 'rgba(0,212,255,0.2)';
+      b.querySelector('.bt').style.color = 'var(--accent)';
+      b.querySelector('.bs').style.color = 'rgba(0,212,255,0.65)';
+
     } else {
       dot.className = 's-dot';
       txt.textContent = 'Sin registros hoy';
@@ -793,7 +802,19 @@ function showLateAlert(lateMin) {
 // ─────────────────────────────────────────
 //  MARK TIME
 // ─────────────────────────────────────────
-async function markTime(type) {
+async function markTime(type, confirmed = false) {
+  // Si es salida anticipada y no ha confirmado → mostrar diálogo
+  if (type === 'Salida' && !confirmed && currentSchedule) {
+    const now = new Date();
+    const [hs, ms] = (currentSchedule.salida || '').split(':').map(Number);
+    const schedOut = new Date(now); schedOut.setHours(hs, ms, 0, 0);
+    if (now < schedOut) {
+      const diffMin = Math.round((schedOut - now) / 60000);
+      showEarlyExitDialog(diffMin);
+      return;
+    }
+  }
+
   const btn = document.getElementById(type === 'Entrada' ? 'btn-entrada' : 'btn-salida');
   const msg = document.getElementById('mark-msg');
   btn.disabled = true;
@@ -822,6 +843,73 @@ async function markTime(type) {
       ? '<span class="a-icon">🟢</span><span>Registrar Entrada</span><span class="a-sub">Marca tu llegada</span>'
       : '<span class="a-icon">🔴</span><span>Registrar Salida</span><span class="a-sub">Marca tu partida</span>';
   }
+}
+
+// ─────────────────────────────────────────
+//  EARLY EXIT DIALOG
+// ─────────────────────────────────────────
+function showEarlyExitDialog(diffMin) {
+  // Crear overlay si no existe
+  let overlay = document.getElementById('early-exit-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'early-exit-overlay';
+    overlay.style.cssText = `
+      position:fixed; inset:0; z-index:900;
+      background:rgba(5,8,15,0.88);
+      backdrop-filter:blur(10px);
+      display:flex; align-items:center; justify-content:center; padding:20px;
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  const h = Math.floor(diffMin / 60);
+  const m = diffMin % 60;
+  const timeStr = h > 0 ? `${h}h ${m}min` : `${m} minuto${m !== 1 ? 's' : ''}`;
+
+  overlay.innerHTML = `
+    <div style="
+      background:var(--surface); border:1px solid rgba(255,171,0,0.3);
+      border-radius:20px; padding:34px; max-width:400px; width:100%;
+      box-shadow:0 20px 60px rgba(0,0,0,0.7); position:relative;
+    ">
+      <div style="font-size:2.5rem; text-align:center; margin-bottom:16px">⚠️</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.2rem;
+                  text-align:center; margin-bottom:10px; color:var(--warning)">
+        Salida anticipada
+      </div>
+      <div style="font-size:0.87rem; color:var(--muted); text-align:center; line-height:1.6; margin-bottom:24px">
+        Tu turno termina a las <strong style="color:var(--text)">${currentSchedule.salida}</strong>.
+        Faltan <strong style="color:var(--warning)">${timeStr}</strong> para completar tu jornada.<br><br>
+        Si sales ahora <strong style="color:var(--danger)">no podrás volver a registrar entrada hoy</strong>.
+        ¿Estás seguro?
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+        <button onclick="closeEarlyExitDialog()"
+          style="padding:12px; border-radius:10px; border:1px solid var(--border2);
+                 background:transparent; color:var(--text); cursor:pointer;
+                 font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:0.9rem;
+                 transition:all 0.2s"
+          onmouseover="this.style.borderColor='var(--accent)'"
+          onmouseout="this.style.borderColor='var(--border2)'">
+          Cancelar
+        </button>
+        <button onclick="closeEarlyExitDialog(); markTime('Salida', true)"
+          style="padding:12px; border-radius:10px; border:none;
+                 background:linear-gradient(135deg, var(--danger), #c0304f);
+                 color:#fff; cursor:pointer;
+                 font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.9rem">
+          Sí, registrar salida
+        </button>
+      </div>
+    </div>
+  `;
+  overlay.style.display = 'flex';
+}
+
+function closeEarlyExitDialog() {
+  const overlay = document.getElementById('early-exit-overlay');
+  if (overlay) overlay.style.display = 'none';
 }
 
 // ─────────────────────────────────────────

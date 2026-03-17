@@ -6,24 +6,25 @@
   <title>Flash High — Control de Asistencia</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
-      --bg: #05080f;
-      --surface: #0d1220;
-      --surface2: #131928;
-      --border: rgba(255,255,255,0.07);
-      --accent: #00d4ff;
-      --accent2: #7b5cf0;
-      --success: #00e676;
-      --warning: #ffab00;
-      --danger: #ff4d6d;
-      --text: #e8eaf0;
-      --muted: #5a6480;
-      --card-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      --bg:       #05080f;
+      --surface:  #0c1118;
+      --surface2: #111720;
+      --surface3: #161e2a;
+      --border:   rgba(255,255,255,0.07);
+      --border2:  rgba(255,255,255,0.12);
+      --accent:   #00d4ff;
+      --accent2:  #6c4ff0;
+      --success:  #00e676;
+      --warning:  #ffab00;
+      --danger:   #ff4d6d;
+      --text:     #e4e8f0;
+      --muted:    #56617a;
+      --muted2:   #3a4255;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin:0; padding:0; box-sizing:border-box; }
 
     body {
       font-family: 'Nunito', sans-serif;
@@ -33,539 +34,329 @@
       overflow-x: hidden;
     }
 
-    /* ─── BG GRID ─── */
+    /* Grid bg */
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
+      content:'';
+      position:fixed; inset:0;
       background-image:
-        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
+        linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events:none; z-index:0;
     }
 
-    /* ─── GLOW ORBS ─── */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.15;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .orb-1 { width: 500px; height: 500px; background: var(--accent); top: -150px; right: -100px; }
-    .orb-2 { width: 400px; height: 400px; background: var(--accent2); bottom: -100px; left: -100px; }
+    /* Orbs */
+    .orb { position:fixed; border-radius:50%; filter:blur(90px); opacity:0.12; pointer-events:none; z-index:0; }
+    .orb-1 { width:600px; height:600px; background:var(--accent);  top:-200px; right:-150px; }
+    .orb-2 { width:500px; height:500px; background:var(--accent2); bottom:-150px; left:-150px; }
 
-    /* ─── HEADER ─── */
+    /* ── HEADER ── */
     header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 16px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(5,8,15,0.8);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      padding:14px 28px;
+      display:flex; align-items:center; justify-content:space-between;
+      background:rgba(5,8,15,0.85);
+      backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
     }
 
     .logo {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 800;
-      font-size: 1.4rem;
-      letter-spacing: -0.02em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:800; font-size:1.3rem;
+      letter-spacing:-0.03em;
+      display:flex; align-items:center; gap:10px;
     }
-
     .logo-icon {
-      width: 32px; height: 32px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
+      width:30px; height:30px;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:13px;
     }
-
-    .logo span { color: var(--accent); }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .logo em { color:var(--accent); font-style:normal; }
 
     #user-badge {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: 40px;
-      font-size: 0.85rem;
+      display:none; align-items:center; gap:10px;
+      background:var(--surface2); border:1px solid var(--border);
+      padding:7px 14px; border-radius:40px; font-size:0.82rem;
     }
-
     .avatar {
-      width: 28px; height: 28px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 0.75rem;
-      color: var(--bg);
+      width:26px; height:26px;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:700; font-size:0.7rem; color:var(--bg);
     }
 
     .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      font-size: 0.85rem;
-      transition: all 0.2s;
+      background:transparent; border:1px solid var(--border);
+      color:var(--muted); padding:7px 14px; border-radius:8px;
+      cursor:pointer; font-family:'Nunito', sans-serif; font-size:0.82rem;
+      transition:all 0.2s;
     }
-    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
 
-    /* ─── MAIN ─── */
+    /* ── MAIN ── */
     main {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 100px 20px 40px;
+      position:relative; z-index:1;
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:90px 20px 40px;
     }
 
-    /* ─── CARDS ─── */
+    /* ── CARD ── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: var(--card-shadow);
-      position: relative;
-      overflow: hidden;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:38px;
+      box-shadow:0 12px 60px rgba(0,0,0,0.6);
+      position:relative; overflow:hidden;
+      width:100%;
     }
-
     .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      opacity: 0.4;
+      content:'';
+      position:absolute; top:0; left:0; right:0; height:1px;
+      background:linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity:0.35;
     }
 
-    /* ─── AUTH VIEW ─── */
-    #view-auth {
-      width: 100%;
-      max-width: 440px;
-    }
+    /* ── LOGIN ── */
+    #view-auth { max-width:420px; }
 
-    .auth-tabs {
-      display: flex;
-      gap: 4px;
-      background: var(--surface2);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 32px;
+    .brand-block {
+      text-align:center; margin-bottom:30px;
     }
+    .brand-block .big-icon {
+      width:56px; height:56px;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius:16px;
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:22px; margin-bottom:14px;
+    }
+    .brand-block h1 {
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:800; font-size:1.7rem; margin-bottom:5px;
+    }
+    .brand-block p { color:var(--muted); font-size:0.88rem; }
 
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 9px;
-      background: transparent;
-      color: var(--muted);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tab-btn.active {
-      background: var(--surface);
-      color: var(--text);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-
-    .auth-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 800;
-      font-size: 1.8rem;
-      margin-bottom: 6px;
-    }
-
-    .auth-sub {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 28px;
-    }
-
-    .form-group {
-      margin-bottom: 18px;
-    }
-
+    .form-group { margin-bottom:16px; }
     label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      display:block; font-size:0.75rem; font-weight:600;
+      color:var(--muted); margin-bottom:6px;
+      text-transform:uppercase; letter-spacing:0.08em;
     }
-
     input {
-      width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 16px;
-      color: var(--text);
-      font-family: 'Nunito', sans-serif;
-      font-size: 0.95rem;
-      transition: border-color 0.2s;
-      outline: none;
+      width:100%;
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:10px; padding:12px 15px;
+      color:var(--text); font-family:'Nunito', sans-serif; font-size:0.93rem;
+      transition:border-color 0.2s; outline:none;
     }
-    input:focus { border-color: var(--accent); }
-    input::placeholder { color: var(--muted); }
+    input:focus { border-color:var(--accent); background:var(--surface3); }
+    input::placeholder { color:var(--muted2); }
+
+    .input-hint {
+      font-size:0.75rem; color:var(--muted); margin-top:5px;
+    }
 
     .btn-primary {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      margin-top: 8px;
+      width:100%; padding:13px;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      border:none; border-radius:10px;
+      color:#fff; font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:700; font-size:0.95rem;
+      cursor:pointer; transition:opacity 0.2s, transform 0.1s;
+      margin-top:6px;
     }
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-primary:active { transform: scale(0.99); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary:hover { opacity:0.9; }
+    .btn-primary:active { transform:scale(0.99); }
+    .btn-primary:disabled { opacity:0.45; cursor:not-allowed; }
 
     .msg {
-      margin-top: 14px;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      display: none;
+      margin-top:12px; padding:11px 15px;
+      border-radius:10px; font-size:0.83rem; display:none;
     }
-    .msg.error { background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.3); color: #ff4d6d; }
-    .msg.success { background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.3); color: var(--success); }
-    .msg.info { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); color: var(--accent); }
+    .msg.error   { background:rgba(255,77,109,0.1);  border:1px solid rgba(255,77,109,0.3);  color:var(--danger); }
+    .msg.success { background:rgba(0,230,118,0.08);  border:1px solid rgba(0,230,118,0.25);  color:var(--success); }
+    .msg.info    { background:rgba(0,212,255,0.07);  border:1px solid rgba(0,212,255,0.2);   color:var(--accent); }
 
-    /* ─── DASHBOARD VIEW ─── */
-    #view-dashboard {
-      width: 100%;
-      max-width: 700px;
-      display: none;
+    /* ── DASHBOARD ── */
+    #view-dashboard { max-width:680px; display:none; }
+
+    .dash-top {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      margin-bottom:26px; flex-wrap:wrap; gap:14px;
     }
-
-    .dash-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
-      gap: 16px;
+    .dash-label {
+      font-size:0.72rem; font-weight:600; color:var(--muted);
+      text-transform:uppercase; letter-spacing:0.1em; margin-bottom:5px;
     }
-
     .dash-greeting {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 800;
-      font-size: 1.6rem;
-      line-height: 1.2;
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:800; font-size:1.55rem; line-height:1.15;
     }
+    .dash-greeting em { color:var(--accent); font-style:normal; }
+    .dash-cedula { font-size:0.78rem; color:var(--muted); margin-top:3px; }
 
-    .dash-greeting span { color: var(--accent); }
-
+    .clock-block { text-align:right; }
     .live-clock {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 2rem;
-      color: var(--accent);
-      letter-spacing: 0.04em;
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:700; font-size:1.9rem;
+      color:var(--accent); letter-spacing:0.03em;
     }
+    .live-date { font-size:0.75rem; color:var(--muted); }
 
-    .live-date {
-      font-size: 0.8rem;
-      color: var(--muted);
-      text-align: right;
+    /* Schedule card */
+    .sched-card {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:14px; padding:18px 22px;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:12px; margin-bottom:16px;
     }
+    .sched-item .s-label { font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+    .sched-item .s-val {
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:700; font-size:1.05rem; margin-top:2px;
+    }
+    .sched-arrow { color:var(--muted); font-size:1rem; }
 
-    /* ─── STATUS WIDGET ─── */
+    .badge {
+      font-size:0.72rem; font-weight:700; padding:4px 12px;
+      border-radius:20px; display:inline-flex; align-items:center; gap:5px;
+    }
+    .badge-late    { background:rgba(255,171,0,0.14); border:1px solid rgba(255,171,0,0.4); color:var(--warning); }
+    .badge-ok      { background:rgba(0,230,118,0.1);  border:1px solid rgba(0,230,118,0.3); color:var(--success); }
+    .badge-soon    { background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2); color:var(--accent); }
+    .badge-blocked { background:rgba(255,77,109,0.1); border:1px solid rgba(255,77,109,0.3); color:var(--danger); }
+
+    /* Status widget */
     .status-widget {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:14px; padding:18px 22px;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:14px; margin-bottom:16px;
+    }
+    .s-dot {
+      width:9px; height:9px; border-radius:50%;
+      background:var(--muted); display:inline-block;
+      margin-right:8px; position:relative;
+    }
+    .s-dot.in { background:var(--success); box-shadow:0 0 0 3px rgba(0,230,118,0.2); }
+    .s-dot.in::after {
+      content:''; position:absolute; inset:-3px; border-radius:50%;
+      border:2px solid rgba(0,230,118,0.35);
+      animation:ping 1.5s ease-in-out infinite;
+    }
+    @keyframes ping { 0%{transform:scale(1);opacity:1} 100%{transform:scale(2);opacity:0} }
+
+    .s-label2 { font-size:0.78rem; color:var(--muted); margin-bottom:3px; }
+    .s-val2 {
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:700; font-size:1rem;
+      display:flex; align-items:center;
     }
 
-    .status-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--muted);
-      display: inline-block;
-      margin-right: 8px;
-      position: relative;
+    /* Block banner */
+    .block-banner {
+      background:rgba(255,77,109,0.08); border:1px solid rgba(255,77,109,0.25);
+      border-radius:12px; padding:14px 18px;
+      display:flex; align-items:flex-start; gap:12px;
+      margin-bottom:16px; font-size:0.83rem;
     }
-    .status-dot.in { background: var(--success); box-shadow: 0 0 0 4px rgba(0,230,118,0.2); }
-    .status-dot.in::after {
-      content: '';
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      border: 2px solid rgba(0,230,118,0.4);
-      animation: ping 1.5s ease-in-out infinite;
-    }
+    .block-banner .bi { font-size:1.3rem; flex-shrink:0; line-height:1; }
+    .block-banner .bt { color:var(--danger); font-weight:700; margin-bottom:3px;
+      font-family:'Plus Jakarta Sans', sans-serif; }
+    .block-banner .bs { color:rgba(255,77,109,0.7); line-height:1.5; }
 
-    @keyframes ping {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(2); opacity: 0; }
-    }
-
-    .status-label {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-    .status-value {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-
-    /* ─── ACTION BUTTONS ─── */
-    .action-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
+    /* Action buttons */
+    .action-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
 
     .action-btn {
-      padding: 22px;
-      border-radius: 16px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
+      padding:20px; border-radius:14px; border:2px solid transparent;
+      cursor:pointer; font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:700; font-size:0.95rem;
+      transition:all 0.2s;
+      display:flex; flex-direction:column; align-items:flex-start; gap:7px;
+      text-align:left;
     }
+    .action-btn .a-icon { font-size:1.6rem; line-height:1; }
+    .action-btn .a-sub  { font-size:0.72rem; font-weight:500; opacity:0.55; font-family:'Nunito', sans-serif; }
 
-    .action-btn .icon { font-size: 1.8rem; }
-    .action-btn .label { font-size: 0.75rem; font-weight: 500; opacity: 0.6; font-family: 'Nunito', sans-serif; }
+    .btn-entrada { background:rgba(0,230,118,0.07); border-color:rgba(0,230,118,0.25); color:var(--success); }
+    .btn-entrada:hover:not(:disabled) { background:rgba(0,230,118,0.13); border-color:var(--success); }
+    .btn-entrada:disabled { opacity:0.28; cursor:not-allowed; }
 
-    .btn-entrada {
-      background: rgba(0,230,118,0.08);
-      border-color: rgba(0,230,118,0.3);
-      color: var(--success);
+    .btn-salida  { background:rgba(255,77,109,0.07); border-color:rgba(255,77,109,0.25); color:var(--danger); }
+    .btn-salida:hover:not(:disabled)  { background:rgba(255,77,109,0.13); border-color:var(--danger); }
+    .btn-salida:disabled  { opacity:0.28; cursor:not-allowed; }
+
+    /* History */
+    .sec-title {
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-size:0.72rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.1em;
+      color:var(--muted); margin-bottom:10px;
     }
-    .btn-entrada:hover { background: rgba(0,230,118,0.15); border-color: var(--success); }
-    .btn-entrada:disabled { opacity: 0.3; cursor: not-allowed; }
+    .history-list { display:flex; flex-direction:column; gap:7px; max-height:200px; overflow-y:auto; }
+    .history-list::-webkit-scrollbar { width:3px; }
+    .history-list::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
 
-    .btn-salida {
-      background: rgba(255,77,109,0.08);
-      border-color: rgba(255,77,109,0.3);
-      color: var(--danger);
+    .h-item {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:10px; padding:10px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      font-size:0.82rem;
     }
-    .btn-salida:hover { background: rgba(255,77,109,0.15); border-color: var(--danger); }
-    .btn-salida:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    /* ─── SCHEDULE WIDGET ─── */
-    .schedule-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 24px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
+    .h-item .h-date { color:var(--muted); }
+    .h-type {
+      font-weight:700; font-size:0.7rem; padding:2px 9px; border-radius:20px;
     }
+    .h-type.entrada { background:rgba(0,230,118,0.1); color:var(--success); }
+    .h-type.salida  { background:rgba(255,77,109,0.1); color:var(--danger); }
+    .h-flag { color:var(--warning); font-size:0.7rem; margin-left:6px; }
 
-    .sched-item {
-      text-align: center;
+    /* Late alert */
+    #late-banner {
+      background:rgba(255,171,0,0.1); border:1px solid rgba(255,171,0,0.4);
+      border-radius:12px; padding:15px 18px;
+      display:none; align-items:flex-start; gap:12px;
+      margin-bottom:16px;
     }
-    .sched-item .s-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-    .sched-item .s-val { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.1rem; margin-top: 2px; }
-
-    .sched-divider { color: var(--border); font-size: 1.5rem; }
-
-    .late-badge {
-      background: rgba(255,171,0,0.15);
-      border: 1px solid rgba(255,171,0,0.4);
-      color: var(--warning);
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 20px;
+    #late-banner .lb-title {
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-weight:700; color:var(--warning); margin-bottom:3px; font-size:0.9rem;
     }
+    #late-banner .lb-sub { font-size:0.8rem; color:rgba(255,171,0,0.7); line-height:1.5; }
 
-    .ontime-badge {
-      background: rgba(0,230,118,0.1);
-      border: 1px solid rgba(0,230,118,0.3);
-      color: var(--success);
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 20px;
-    }
-
-    /* ─── HISTORY ─── */
-    .section-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 220px;
-      overflow-y: auto;
-    }
-
-    .history-list::-webkit-scrollbar { width: 4px; }
-    .history-list::-webkit-scrollbar-track { background: transparent; }
-    .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    .history-item {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.85rem;
-    }
-
-    .history-item .h-date { color: var(--muted); }
-    .history-item .h-type {
-      font-weight: 600;
-      font-size: 0.75rem;
-      padding: 3px 10px;
-      border-radius: 20px;
-    }
-    .h-type.entrada { background: rgba(0,230,118,0.1); color: var(--success); }
-    .h-type.salida { background: rgba(255,77,109,0.1); color: var(--danger); }
-    .history-item .h-flag { color: var(--warning); font-size: 0.75rem; margin-left: 8px; }
-
-    /* ─── QR SECTION ─── */
-    .qr-section {
-      margin-top: 24px;
-      border-top: 1px solid var(--border);
-      padding-top: 24px;
-    }
-
-    .qr-wrap {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    #qr-canvas {
-      background: #fff;
-      border-radius: 12px;
-      padding: 10px;
-      flex-shrink: 0;
-    }
-
-    .qr-info h4 {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 6px;
-    }
-    .qr-info p { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
-
-    .btn-sm {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      font-size: 0.8rem;
-      margin-top: 10px;
-      transition: border-color 0.2s;
-    }
-    .btn-sm:hover { border-color: var(--accent); }
-
-    /* ─── LOADING ─── */
+    /* Spinner & Toast */
     .spinner {
-      display: inline-block;
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
+      display:inline-block; width:14px; height:14px;
+      border:2px solid rgba(255,255,255,0.25); border-top-color:#fff;
+      border-radius:50%; animation:spin 0.7s linear infinite;
+      vertical-align:middle; margin-right:7px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* ─── TOAST ─── */
     #toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 24px;
-      font-size: 0.9rem;
-      z-index: 999;
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-      pointer-events: none;
-      white-space: nowrap;
+      position:fixed; bottom:28px; left:50%;
+      transform:translateX(-50%) translateY(70px);
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:11px; padding:12px 22px;
+      font-size:0.85rem; z-index:999;
+      transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events:none; white-space:nowrap;
     }
-    #toast.show { transform: translateX(-50%) translateY(0); }
-    #toast.success { border-color: rgba(0,230,118,0.4); color: var(--success); }
-    #toast.error { border-color: rgba(255,77,109,0.4); color: var(--danger); }
-    #toast.warning { border-color: rgba(255,171,0,0.4); color: var(--warning); }
+    #toast.show { transform:translateX(-50%) translateY(0); }
+    #toast.success { border-color:rgba(0,230,118,0.4); color:var(--success); }
+    #toast.error   { border-color:rgba(255,77,109,0.4); color:var(--danger); }
+    #toast.warning { border-color:rgba(255,171,0,0.4);  color:var(--warning); }
 
-    @media (max-width: 520px) {
-      .action-grid { grid-template-columns: 1fr; }
-      .live-clock { font-size: 1.5rem; }
-      .card { padding: 24px; }
+    @media (max-width:520px) {
+      .action-grid { grid-template-columns:1fr; }
+      .live-clock  { font-size:1.4rem; }
+      .card        { padding:22px; }
     }
   </style>
 </head>
@@ -577,9 +368,9 @@
 <header>
   <div class="logo">
     <div class="logo-icon">⚡</div>
-    Flash <span>High</span>
+    Flash <em>High</em>
   </div>
-  <div class="header-right">
+  <div style="display:flex;align-items:center;gap:10px">
     <div id="user-badge">
       <div class="avatar" id="avatar-initials">?</div>
       <span id="header-name">—</span>
@@ -590,337 +381,263 @@
 
 <main>
 
-  <!-- AUTH VIEW -->
+  <!-- LOGIN -->
   <div class="card" id="view-auth">
-    <div class="auth-tabs">
-      <button class="tab-btn active" onclick="switchTab('login')">Iniciar sesión</button>
-      <button class="tab-btn" onclick="switchTab('register')">Registrarse</button>
+    <div class="brand-block">
+      <div class="big-icon">⚡</div>
+      <h1>Flash High</h1>
+      <p>Control de asistencia — ingresa con tu correo y cédula</p>
     </div>
-
-    <!-- LOGIN -->
-    <div id="tab-login">
-      <div class="auth-title">Bienvenido 👋</div>
-      <div class="auth-sub">Ingresa tus credenciales para continuar</div>
-      <div class="form-group">
-        <label>Cédula o Correo</label>
-        <input type="text" id="login-user" placeholder="Ej: 123456789" autocomplete="username" />
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
-      </div>
-      <button class="btn-primary" id="btn-login" onclick="doLogin()">Ingresar</button>
-      <div class="msg" id="login-msg"></div>
+    <div class="form-group">
+      <label>Correo electrónico</label>
+      <input type="email" id="login-correo" placeholder="tucorreo@empresa.com" autocomplete="email" />
     </div>
-
-    <!-- REGISTER -->
-    <div id="tab-register" style="display:none">
-      <div class="auth-title">Crear cuenta</div>
-      <div class="auth-sub">Completa todos los campos para registrarte</div>
-      <div class="form-group">
-        <label>Nombre completo</label>
-        <input type="text" id="reg-name" placeholder="Ej: Juan Pérez García" />
-      </div>
-      <div class="form-group">
-        <label>Cédula</label>
-        <input type="text" id="reg-cedula" placeholder="Ej: 123456789" />
-      </div>
-      <div class="form-group">
-        <label>Correo electrónico</label>
-        <input type="email" id="reg-email" placeholder="juan@empresa.com" />
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" />
-      </div>
-      <button class="btn-primary" id="btn-register" onclick="doRegister()">Crear cuenta</button>
-      <div class="msg" id="register-msg"></div>
+    <div class="form-group">
+      <label>Cédula (contraseña)</label>
+      <input type="password" id="login-cedula" placeholder="Tu número de cédula" autocomplete="current-password" />
+      <div class="input-hint">Tu cédula es tu contraseña de acceso</div>
     </div>
+    <button class="btn-primary" id="btn-login" onclick="doLogin()">Ingresar</button>
+    <div class="msg" id="login-msg"></div>
   </div>
 
-  <!-- DASHBOARD VIEW -->
+  <!-- DASHBOARD -->
   <div class="card" id="view-dashboard">
-    <div class="dash-header">
+
+    <!-- Top row -->
+    <div class="dash-top">
       <div>
-        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.08em;">Panel de asistencia</div>
-        <div class="dash-greeting">Hola, <span id="dash-name">—</span></div>
-        <div style="font-size:0.8rem;color:var(--muted);margin-top:4px;" id="dash-cedula">Cédula: —</div>
+        <div class="dash-label">Panel de asistencia</div>
+        <div class="dash-greeting">Hola, <em id="dash-name">—</em></div>
+        <div class="dash-cedula" id="dash-cedula">Cédula: —</div>
       </div>
-      <div style="text-align:right">
+      <div class="clock-block">
         <div class="live-clock" id="clock">--:--:--</div>
         <div class="live-date" id="date-label">—</div>
       </div>
     </div>
 
-    <!-- SCHEDULE -->
-    <div class="schedule-card" id="schedule-card">
+    <!-- Schedule -->
+    <div class="sched-card" id="sched-card">
       <div class="sched-item">
         <div class="s-label">Entrada programada</div>
         <div class="s-val" id="sched-in">--:--</div>
       </div>
-      <div class="sched-divider">→</div>
+      <div class="sched-arrow">→</div>
       <div class="sched-item">
         <div class="s-label">Salida programada</div>
         <div class="s-val" id="sched-out">--:--</div>
       </div>
-      <div id="punctuality-badge"></div>
+      <div id="punct-badge"></div>
     </div>
 
-    <!-- STATUS -->
+    <!-- Block banner (fuera de horario) -->
+    <div id="block-banner" class="block-banner" style="display:none">
+      <span class="bi">🔒</span>
+      <div>
+        <div class="bt" id="block-title">Fuera de horario</div>
+        <div class="bs" id="block-msg">—</div>
+      </div>
+    </div>
+
+    <!-- Late banner -->
+    <div id="late-banner">
+      <span style="font-size:1.5rem;line-height:1">⚠️</span>
+      <div>
+        <div class="lb-title" id="late-title">Llegada tarde</div>
+        <div class="lb-sub"  id="late-sub">—</div>
+      </div>
+      <button onclick="document.getElementById('late-banner').style.display='none'"
+        style="margin-left:auto;background:transparent;border:none;color:rgba(255,171,0,0.5);cursor:pointer;font-size:1.1rem">✕</button>
+    </div>
+
+    <!-- Status -->
     <div class="status-widget">
       <div>
-        <div class="status-label">Estado actual</div>
-        <div class="status-value">
-          <span class="status-dot" id="status-dot"></span>
-          <span id="status-text">Sin registros hoy</span>
-        </div>
+        <div class="s-label2">Estado actual</div>
+        <div class="s-val2"><span class="s-dot" id="s-dot"></span><span id="s-text">Sin registros hoy</span></div>
       </div>
-      <div id="time-elapsed-wrap" style="display:none">
-        <div class="status-label">Tiempo trabajado</div>
-        <div class="status-value" id="time-elapsed">0h 0m</div>
+      <div id="elapsed-wrap" style="display:none">
+        <div class="s-label2">Tiempo trabajado</div>
+        <div class="s-val2" id="elapsed">0h 0m</div>
       </div>
     </div>
 
-    <!-- ACTIONS -->
+    <!-- Action buttons -->
     <div class="action-grid">
       <button class="action-btn btn-entrada" id="btn-entrada" onclick="markTime('Entrada')">
-        <span class="icon">🟢</span>
-        <span style="font-size:1.1rem">Registrar Entrada</span>
-        <span class="label">Marca tu llegada</span>
+        <span class="a-icon">🟢</span>
+        <span>Registrar Entrada</span>
+        <span class="a-sub">Marca tu llegada</span>
       </button>
       <button class="action-btn btn-salida" id="btn-salida" onclick="markTime('Salida')" disabled>
-        <span class="icon">🔴</span>
-        <span style="font-size:1.1rem">Registrar Salida</span>
-        <span class="label">Marca tu partida</span>
+        <span class="a-icon">🔴</span>
+        <span>Registrar Salida</span>
+        <span class="a-sub">Marca tu partida</span>
       </button>
     </div>
 
     <div class="msg" id="mark-msg"></div>
 
-    <!-- HISTORY -->
-    <div class="section-title" style="margin-top:20px">Registros recientes</div>
+    <!-- History -->
+    <div class="sec-title" style="margin-top:18px">Registros recientes</div>
     <div class="history-list" id="history-list">
-      <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px">Cargando historial...</div>
+      <div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:18px">Cargando...</div>
     </div>
 
-    <!-- QR -->
-    <div class="qr-section">
-      <div class="section-title">Mi código QR personal</div>
-      <div class="qr-wrap">
-        <div id="qr-canvas"></div>
-        <div class="qr-info">
-          <h4>Acceso rápido</h4>
-          <p>Escanea este QR para acceder directamente a tu registro desde cualquier dispositivo. Tu sesión se iniciará automáticamente.</p>
-          <button class="btn-sm" onclick="downloadQR()">⬇ Descargar QR</button>
-        </div>
-      </div>
-    </div>
   </div>
-
 </main>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 //  CONFIG
-// ═══════════════════════════════════════
-// ═══════════════════════════════════════
-//  CONFIG — URL del Apps Script (hardcoded)
-//  ⚠ Reemplaza esto con tu URL real después de desplegar el Apps Script
-// ═══════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbxBeA66S7tM4DFGumfW3wM0Tv3CjyLRXxPISLOVlzM2ZdE23gOLoBVpRxsEfxt4mCYgxw/exec';
-let currentUser = null;
-let qrInstance = null;
-let elapsedInterval = null;
-let entryTime = null;
+// ─────────────────────────────────────────
+const API_URL = 'https://script.google.com/macros/s/AKfycbynOZ7FKfRddxllPzT8-YmbJqsgBHOQSGsvqvXZjfQ-feG6RgOz0-VBYVtGXEUkNBqZXg/exec';
 
-const DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+let currentUser     = null;
+let currentSchedule = null;
+let elapsedInterval = null;
+let schedInterval   = null;
+let entryTimestamp  = null;
+
+const DAYS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 //  CLOCK
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 function updateClock() {
   const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  const s = String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+  document.getElementById('clock').textContent =
+    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
   document.getElementById('date-label').textContent =
     `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
 }
 setInterval(updateClock, 1000);
 updateClock();
 
-// ═══════════════════════════════════════
-//  TABS
-// ═══════════════════════════════════════
-function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
-  document.getElementById('tab-login').style.display = tab==='login' ? '' : 'none';
-  document.getElementById('tab-register').style.display = tab==='register' ? '' : 'none';
-}
-
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 //  TOAST
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 function toast(msg, type='success') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = `show ${type}`;
-  setTimeout(() => t.className = '', 3000);
+  setTimeout(() => t.className = '', 3200);
 }
 
-// ═══════════════════════════════════════
-//  API CALL
-// ═══════════════════════════════════════
-async function api(action, params={}) {
+// ─────────────────────────────────────────
+//  API
+// ─────────────────────────────────────────
+async function api(action, params = {}) {
   const url = new URL(API_URL);
   url.searchParams.set('action', action);
-  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   const res = await fetch(url.toString());
-  if (!res.ok) throw new Error('Error de red');
+  if (!res.ok) throw new Error('Error de red (' + res.status + ')');
   return res.json();
 }
 
-// ═══════════════════════════════════════
-//  AUTH
-// ═══════════════════════════════════════
-async function doLogin() {
-  const user = document.getElementById('login-user').value.trim();
-  const pass = document.getElementById('login-pass').value.trim();
-  const msg = document.getElementById('login-msg');
-  const btn = document.getElementById('btn-login');
-
-  if (!user || !pass) return showMsg(msg, 'Completa todos los campos.', 'error');
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Verificando...';
-  msg.style.display = 'none';
-
-  try {
-    const data = await api('login', { user, pass });
-    if (data.ok) {
-      saveSession(data.employee);
-      enterDashboard(data.employee);
-    } else {
-      showMsg(msg, data.error || 'Credenciales incorrectas.', 'error');
-    }
-  } catch(e) {
-    showMsg(msg, e.message || 'Error de conexión.', 'error');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Ingresar';
-  }
-}
-
-async function doRegister() {
-  const name   = document.getElementById('reg-name').value.trim();
-  const cedula = document.getElementById('reg-cedula').value.trim();
-  const email  = document.getElementById('reg-email').value.trim();
-  const pass   = document.getElementById('reg-pass').value.trim();
-  const msg    = document.getElementById('register-msg');
-  const btn    = document.getElementById('btn-register');
-
-  if (!name||!cedula||!email||!pass) return showMsg(msg,'Completa todos los campos.','error');
-  if (pass.length < 6) return showMsg(msg,'La contraseña debe tener al menos 6 caracteres.','error');
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Registrando...';
-
-  try {
-    const data = await api('register', { name, cedula, email, pass });
-    if (data.ok) {
-      showMsg(msg, '¡Cuenta creada! Ahora puedes iniciar sesión.', 'success');
-      setTimeout(() => switchTab('login'), 2000);
-    } else {
-      showMsg(msg, data.error || 'Error al registrar.', 'error');
-    }
-  } catch(e) {
-    showMsg(msg, e.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Crear cuenta';
-  }
-}
-
+// ─────────────────────────────────────────
+//  HELPERS UI
+// ─────────────────────────────────────────
 function showMsg(el, text, type) {
   el.textContent = text;
   el.className = `msg ${type}`;
   el.style.display = 'block';
 }
 
-// ═══════════════════════════════════════
-//  SESSION
-// ═══════════════════════════════════════
-function saveSession(emp) {
-  localStorage.setItem('fh_session', JSON.stringify(emp));
+function setBtn(id, html) {
+  document.getElementById(id).innerHTML = html;
 }
 
-function loadSession() {
-  try { return JSON.parse(localStorage.getItem('fh_session')); } catch { return null; }
-}
+// ─────────────────────────────────────────
+//  SESSION
+// ─────────────────────────────────────────
+function saveSession(emp) { localStorage.setItem('fh_session', JSON.stringify(emp)); }
+function loadSession()    { try { return JSON.parse(localStorage.getItem('fh_session')); } catch { return null; } }
 
 function logout() {
   localStorage.removeItem('fh_session');
-  currentUser = null;
+  currentUser = currentSchedule = null;
+  clearInterval(elapsedInterval);
+  clearInterval(schedInterval);
   document.getElementById('view-auth').style.display = '';
   document.getElementById('view-dashboard').style.display = 'none';
   document.getElementById('user-badge').style.display = 'none';
   document.getElementById('btn-logout').style.display = 'none';
-  clearInterval(elapsedInterval);
-  if (scheduleCheckInterval) clearInterval(scheduleCheckInterval);
-  currentSchedule = null;
 }
 
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
+//  LOGIN
+// ─────────────────────────────────────────
+async function doLogin() {
+  const correo = document.getElementById('login-correo').value.trim();
+  const cedula = document.getElementById('login-cedula').value.trim();
+  const msg    = document.getElementById('login-msg');
+  const btn    = document.getElementById('btn-login');
+
+  if (!correo || !cedula) return showMsg(msg, 'Ingresa tu correo y cédula.', 'error');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Verificando...';
+  msg.style.display = 'none';
+
+  try {
+    const data = await api('login', { correo, cedula });
+    if (data.ok) {
+      saveSession(data.employee);
+      enterDashboard(data.employee);
+    } else {
+      showMsg(msg, data.error || 'Datos incorrectos.', 'error');
+    }
+  } catch(e) {
+    showMsg(msg, 'Error de conexión: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Ingresar';
+  }
+}
+
+// ─────────────────────────────────────────
 //  DASHBOARD
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 async function enterDashboard(emp) {
   currentUser = emp;
-
   document.getElementById('view-auth').style.display = 'none';
   document.getElementById('view-dashboard').style.display = 'block';
 
-  const badge = document.getElementById('user-badge');
-  badge.style.display = 'flex';
-  document.getElementById('btn-logout').style.display = '';
-
-  const initials = emp.name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const initials = emp.name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
   document.getElementById('avatar-initials').textContent = initials;
   document.getElementById('header-name').textContent = emp.name.split(' ')[0];
-  document.getElementById('dash-name').textContent = emp.name.split(' ')[0];
-  document.getElementById('dash-cedula').textContent = `Cédula: ${emp.cedula}`;
+  document.getElementById('user-badge').style.display = 'flex';
+  document.getElementById('btn-logout').style.display = '';
 
-  generateQR(emp);
+  document.getElementById('dash-name').textContent   = emp.name.split(' ')[0];
+  document.getElementById('dash-cedula').textContent = 'Cédula: ' + emp.cedula;
+
   await loadSchedule(emp.cedula);
   await loadTodayStatus(emp.cedula);
   await loadHistory(emp.cedula);
 }
 
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 //  SCHEDULE
-// ═══════════════════════════════════════
-// Guardamos el horario globalmente para usarlo en el bloqueo de botones
-let currentSchedule = null;
-let scheduleCheckInterval = null;
-
+// ─────────────────────────────────────────
 async function loadSchedule(cedula) {
   try {
     const data = await api('getSchedule', { cedula });
-    if (data.entrada) {
+    if (data.ok && data.entrada && data.entrada !== '--:--') {
       currentSchedule = data;
       document.getElementById('sched-in').textContent  = data.entrada;
       document.getElementById('sched-out').textContent = data.salida;
-      checkPunctuality(data.entrada, data.tolerancia || 10);
-      // Revisar bloqueo cada 30 segundos por si cambia la hora
-      if (scheduleCheckInterval) clearInterval(scheduleCheckInterval);
-      scheduleCheckInterval = setInterval(() => enforceScheduleBlock(), 30000);
-      enforceScheduleBlock();
+      enforceSchedule();
+      if (schedInterval) clearInterval(schedInterval);
+      schedInterval = setInterval(enforceSchedule, 20000);
     } else {
-      document.getElementById('sched-in').textContent = 'No asignado';
+      document.getElementById('sched-in').textContent  = 'No asignado';
       document.getElementById('sched-out').textContent = 'No asignado';
     }
   } catch {
@@ -928,137 +645,156 @@ async function loadSchedule(cedula) {
   }
 }
 
-function checkPunctuality(schedIn, toleranceMins) {
-  const now = new Date();
-  const [h,m] = schedIn.split(':').map(Number);
-  const scheduled = new Date(now); scheduled.setHours(h,m,0,0);
-  const limitTime = new Date(scheduled.getTime() + toleranceMins * 60000);
-  const badge = document.getElementById('punctuality-badge');
-  if (now > limitTime) {
-    badge.innerHTML = `<span class="late-badge">⚠ Llegas tarde</span>`;
-  } else if (now >= scheduled) {
-    badge.innerHTML = `<span class="ontime-badge">✓ A tiempo</span>`;
+// ─────────────────────────────────────────
+//  ENFORCE SCHEDULE — bloquea botones fuera de horario
+// ─────────────────────────────────────────
+function enforceSchedule() {
+  if (!currentSchedule) return;
+
+  const now    = new Date();
+  const badge  = document.getElementById('punct-badge');
+  const banner = document.getElementById('block-banner');
+  const btnE   = document.getElementById('btn-entrada');
+  const btnS   = document.getElementById('btn-salida');
+
+  // Parsear hora de entrada y salida
+  const [hi, mi] = (currentSchedule.entrada || '').split(':').map(Number);
+  const [hs, ms] = (currentSchedule.salida  || '').split(':').map(Number);
+
+  const schedIn  = new Date(now); schedIn.setHours(hi, mi, 0, 0);
+  const schedOut = new Date(now); schedOut.setHours(hs, ms, 0, 0);
+
+  const tolMs    = (currentSchedule.tolerancia || 10) * 60000;
+  const lateLimit = new Date(schedIn.getTime() + tolMs);
+
+  // ── Ventana permitida para entrada: desde 60 min antes hasta schedOut
+  const openFrom = new Date(schedIn.getTime() - 60 * 60000);
+
+  // Badge puntualidad
+  if (now < schedIn) {
+    const diffMin = Math.round((schedIn - now) / 60000);
+    badge.innerHTML = diffMin <= 60
+      ? `<span class="badge badge-soon">🕐 Faltan ${diffMin} min</span>`
+      : `<span class="badge badge-blocked">🔒 Fuera de horario</span>`;
+  } else if (now <= lateLimit) {
+    badge.innerHTML = `<span class="badge badge-ok">✓ A tiempo</span>`;
+  } else if (now <= schedOut) {
+    badge.innerHTML = `<span class="badge badge-late">⚠ Tarde</span>`;
   } else {
-    // Aún antes de la hora de entrada
-    const diffMin = Math.round((scheduled - now) / 60000);
-    if (diffMin <= 60) {
-      badge.innerHTML = `<span class="ontime-badge">🕐 Faltan ${diffMin} min</span>`;
-    }
+    badge.innerHTML = `<span class="badge badge-blocked">🔒 Turno finalizado</span>`;
   }
-}
 
-// Bloquea el botón de entrada si aún no es la hora de inicio del turno
-function enforceScheduleBlock() {
-  if (!currentSchedule || !currentSchedule.entrada) return;
+  // ── Bloqueo del botón Entrada ─────────────────────
+  // Ya tiene entrada registrada → no tocar (loadTodayStatus lo maneja)
+  const alreadyIn = btnE.disabled && btnS.disabled === false; // tiene entrada, no salida
+  const alreadyOut = btnE.disabled && btnS.disabled;
 
-  // No bloquear si ya hay entrada registrada hoy
-  const btnE = document.getElementById('btn-entrada');
-  if (btnE.disabled) return;
-
-  const now = new Date();
-  const [h, m] = currentSchedule.entrada.split(':').map(Number);
-  const schedStart = new Date(now); schedStart.setHours(h, m, 0, 0);
-
-  // Bloquear si faltan más de 60 minutos (el backend también lo valida,
-  // pero así el usuario ve el mensaje sin necesidad de hacer clic)
-  const diffMin = Math.round((schedStart - now) / 60000);
-
-  const infoEl = document.getElementById('schedule-block-info');
-
-  if (now < schedStart && diffMin > 60) {
-    // Fuera de horario — bloquear botón y mostrar mensaje
-    btnE.disabled = true;
-    btnE.title = `Tu turno comienza a las ${currentSchedule.entrada}`;
-    if (!infoEl) {
-      const el = document.createElement('div');
-      el.id = 'schedule-block-info';
-      el.style.cssText = `
-        background: rgba(0,212,255,0.07);
-        border: 1px solid rgba(0,212,255,0.2);
-        border-radius: 12px;
-        padding: 14px 18px;
-        font-size: 0.85rem;
-        color: var(--accent);
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      `;
-      el.innerHTML = `
-        <span style="font-size:1.3rem">🕐</span>
-        <span>Tu turno comienza a las <strong>${currentSchedule.entrada}</strong>. 
-        Faltan <strong>${diffMin} minutos</strong> — el registro estará disponible 60 min antes.</span>
-      `;
-      const grid = document.querySelector('.action-grid');
-      grid.parentNode.insertBefore(el, grid);
+  if (!alreadyIn && !alreadyOut) {
+    if (now < openFrom) {
+      // Demasiado temprano
+      btnE.disabled = true;
+      const diffMin = Math.round((schedIn - now) / 60000);
+      showBlockBanner(
+        '🕐 Aún no es tu hora',
+        `Tu turno comienza a las <strong>${currentSchedule.entrada}</strong>. Faltan <strong>${diffMin} minutos</strong>. El registro se habilitará 60 minutos antes.`
+      );
+    } else if (now > schedOut) {
+      // Turno terminado
+      btnE.disabled = true;
+      showBlockBanner(
+        '🔒 Turno finalizado',
+        `Tu turno terminó a las <strong>${currentSchedule.salida}</strong>. Ya no puedes registrar entrada hasta mañana.`
+      );
     } else {
-      // Actualizar minutos en el mensaje existente
-      infoEl.querySelector('span:last-child').innerHTML =
-        `Tu turno comienza a las <strong>${currentSchedule.entrada}</strong>. 
-        Faltan <strong>${diffMin} minutos</strong> — el registro estará disponible 60 min antes.`;
+      // Dentro de la ventana permitida
+      btnE.disabled = false;
+      hideBlockBanner();
     }
   } else {
-    // Dentro del rango permitido — desbloquear y quitar mensaje
-    btnE.disabled = false;
-    btnE.title = '';
-    if (infoEl) infoEl.remove();
-    // Actualizar badge de puntualidad en tiempo real
-    checkPunctuality(currentSchedule.entrada, currentSchedule.tolerancia || 10);
+    hideBlockBanner();
   }
 }
 
-// ═══════════════════════════════════════
+function showBlockBanner(title, msg) {
+  document.getElementById('block-title').innerHTML = title;
+  document.getElementById('block-msg').innerHTML   = msg;
+  document.getElementById('block-banner').style.display = 'flex';
+}
+function hideBlockBanner() {
+  document.getElementById('block-banner').style.display = 'none';
+}
+
+// ─────────────────────────────────────────
 //  TODAY STATUS
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 async function loadTodayStatus(cedula) {
   try {
     const data = await api('getTodayStatus', { cedula });
-    const dot  = document.getElementById('status-dot');
-    const txt  = document.getElementById('status-text');
+    const dot  = document.getElementById('s-dot');
+    const txt  = document.getElementById('s-text');
     const btnE = document.getElementById('btn-entrada');
     const btnS = document.getElementById('btn-salida');
 
     if (data.status === 'in') {
-      dot.className = 'status-dot in';
+      dot.className = 's-dot in';
       txt.textContent = `Entrada: ${data.entryTime}`;
       btnE.disabled = true;
       btnS.disabled = false;
-      entryTime = data.entryTimestamp;
+      entryTimestamp = Date.now();
       startElapsed();
+      hideBlockBanner();
+      // Mostrar banner de tardanza si llegó tarde
+      if (data.late && data.lateMin > 0) {
+        showLateAlert(data.lateMin);
+      }
     } else if (data.status === 'out') {
-      dot.className = 'status-dot';
-      txt.textContent = `Salida: ${data.exitTime}`;
+      dot.className = 's-dot';
+      txt.textContent = `Entrada: ${data.entryTime}  →  Salida: ${data.exitTime}`;
       btnE.disabled = true;
       btnS.disabled = true;
-      document.getElementById('time-elapsed-wrap').style.display = 'block';
-      document.getElementById('time-elapsed').textContent = data.worked || '—';
+      hideBlockBanner();
     } else {
-      dot.className = 'status-dot';
+      dot.className = 's-dot';
       txt.textContent = 'Sin registros hoy';
+      enforceSchedule();
     }
   } catch(e) {
-    console.warn(e);
+    console.warn('getTodayStatus:', e);
   }
 }
 
 function startElapsed() {
-  document.getElementById('time-elapsed-wrap').style.display = 'block';
+  document.getElementById('elapsed-wrap').style.display = 'block';
   const update = () => {
-    if (!entryTime) return;
-    const diff = Date.now() - new Date(entryTime).getTime();
-    const h = Math.floor(diff/3600000);
-    const m = Math.floor((diff%3600000)/60000);
-    document.getElementById('time-elapsed').textContent = `${h}h ${m}m`;
+    if (!entryTimestamp) return;
+    const diff = Date.now() - entryTimestamp;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('elapsed').textContent = `${h}h ${m}m`;
   };
   update();
+  clearInterval(elapsedInterval);
   elapsedInterval = setInterval(update, 30000);
 }
 
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
+//  LATE ALERT
+// ─────────────────────────────────────────
+function showLateAlert(lateMin) {
+  const h   = Math.floor(lateMin / 60);
+  const m   = lateMin % 60;
+  const str = h > 0 ? `${h}h ${m}min` : `${m} minuto${m !== 1 ? 's' : ''}`;
+  document.getElementById('late-title').textContent = `Llegada tarde — ${str} de retraso`;
+  document.getElementById('late-sub').innerHTML =
+    `Tu horario de entrada era a las <strong>${currentSchedule ? currentSchedule.entrada : '--:--'}</strong>. Este retraso ha sido registrado.`;
+  document.getElementById('late-banner').style.display = 'flex';
+}
+
+// ─────────────────────────────────────────
 //  MARK TIME
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 async function markTime(type) {
-  const btn = type==='Entrada' ? document.getElementById('btn-entrada') : document.getElementById('btn-salida');
+  const btn = document.getElementById(type === 'Entrada' ? 'btn-entrada' : 'btn-salida');
   const msg = document.getElementById('mark-msg');
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span>`;
@@ -1066,171 +802,67 @@ async function markTime(type) {
   try {
     const data = await api('markTime', { cedula: currentUser.cedula, type });
     if (data.ok) {
-      // ── Mostrar banner de tardanza ──────────────────
+      msg.style.display = 'none';
       if (data.late && data.lateMin > 0) {
-        showLateAlert(data.lateMin, data.schedIn);
+        showLateAlert(data.lateMin);
       } else {
-        hideLateAlert();
         toast(`${type} registrada a las ${data.time} ✓`, 'success');
       }
       await loadTodayStatus(currentUser.cedula);
       await loadHistory(currentUser.cedula);
-      msg.style.display = 'none';
     } else {
       showMsg(msg, data.error || 'Error al registrar.', 'error');
       btn.disabled = false;
     }
   } catch(e) {
-    showMsg(msg, e.message, 'error');
+    showMsg(msg, 'Error de conexión: ' + e.message, 'error');
     btn.disabled = false;
   } finally {
-    btn.innerHTML = btn.id==='btn-entrada'
-      ? '<span class="icon">🟢</span><span style="font-size:1.1rem">Registrar Entrada</span><span class="label">Marca tu llegada</span>'
-      : '<span class="icon">🔴</span><span style="font-size:1.1rem">Registrar Salida</span><span class="label">Marca tu partida</span>';
+    btn.innerHTML = type === 'Entrada'
+      ? '<span class="a-icon">🟢</span><span>Registrar Entrada</span><span class="a-sub">Marca tu llegada</span>'
+      : '<span class="a-icon">🔴</span><span>Registrar Salida</span><span class="a-sub">Marca tu partida</span>';
   }
 }
 
-function showLateAlert(minutes, schedIn) {
-  let banner = document.getElementById('late-banner');
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'late-banner';
-    banner.style.cssText = `
-      background: rgba(255,171,0,0.12);
-      border: 1px solid rgba(255,171,0,0.5);
-      border-radius: 14px;
-      padding: 18px 22px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      animation: fadeIn .4s ease;
-    `;
-    // Insertar después del schedule-card
-    const schedCard = document.getElementById('schedule-card');
-    schedCard.parentNode.insertBefore(banner, schedCard.nextSibling);
-  }
-  const hrs  = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  const timeStr = hrs > 0 ? `${hrs}h ${mins}min` : `${mins} minuto${mins!==1?'s':''}`;
-  banner.innerHTML = `
-    <span style="font-size:1.8rem;line-height:1">⚠️</span>
-    <div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:1rem;color:#ffab00;margin-bottom:4px">
-        Llegada tarde — ${timeStr} de retraso
-      </div>
-      <div style="font-size:0.82rem;color:rgba(255,171,0,0.75);line-height:1.5">
-        Tu horario de entrada era a las <strong>${schedIn || '--:--'}</strong>.
-        Este retraso ha sido registrado y notificado al administrador.
-      </div>
-    </div>
-    <button onclick="hideLateAlert()" style="
-      margin-left:auto; background:transparent; border:none;
-      color:rgba(255,171,0,0.5); cursor:pointer; font-size:1.2rem; line-height:1; padding:0 4px;
-    ">✕</button>
-  `;
-}
-
-function hideLateAlert() {
-  const b = document.getElementById('late-banner');
-  if (b) b.remove();
-}
-
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 //  HISTORY
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 async function loadHistory(cedula) {
   const list = document.getElementById('history-list');
   try {
-    const data = await api('getHistory', { cedula, limit: 10 });
+    const data = await api('getHistory', { cedula, limit: 12 });
     if (!data.records || !data.records.length) {
-      list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px">Sin registros aún</div>';
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:18px">Sin registros aún</div>';
       return;
     }
     list.innerHTML = data.records.map(r => `
-      <div class="history-item">
-        <span class="h-date">${r.date} ${r.time}</span>
+      <div class="h-item">
+        <span class="h-date">${r.date} &nbsp; ${r.time}</span>
         <div style="display:flex;align-items:center">
           <span class="h-type ${r.type.toLowerCase()}">${r.type}</span>
           ${r.late ? `<span class="h-flag">⚠ +${r.lateMin}min</span>` : ''}
         </div>
-      </div>
-    `).join('');
+      </div>`).join('');
   } catch {
-    list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px">No se pudo cargar el historial</div>';
+    list.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:18px">No se pudo cargar</div>';
   }
 }
 
-// ═══════════════════════════════════════
-//  QR
-// ═══════════════════════════════════════
-function generateQR(emp) {
-  const container = document.getElementById('qr-canvas');
-  container.innerHTML = '';
-  const pageURL = window.location.href.split('?')[0];
-  const qrURL = `${pageURL}?auto=${encodeURIComponent(emp.cedula)}&t=${btoa(emp.token||emp.cedula)}`;
-  qrInstance = new QRCode(container, {
-    text: qrURL,
-    width: 110,
-    height: 110,
-    colorDark: '#000',
-    colorLight: '#fff',
-    correctLevel: QRCode.CorrectLevel.M
-  });
-}
-
-function downloadQR() {
-  const canvas = document.querySelector('#qr-canvas canvas');
-  if (!canvas) return toast('Error generando QR', 'error');
-  const a = document.createElement('a');
-  a.download = `QR_FlashHigh_${currentUser.cedula}.png`;
-  a.href = canvas.toDataURL();
-  a.click();
-}
-
-// ═══════════════════════════════════════
-//  AUTO-LOGIN FROM QR
-// ═══════════════════════════════════════
-async function checkAutoLogin() {
-  const params = new URLSearchParams(window.location.search);
-  const cedula = params.get('auto');
-  const token  = params.get('t');
-  if (cedula && token) {
-    try {
-      const data = await api('loginQR', { cedula, token });
-      if (data.ok) {
-        saveSession(data.employee);
-        enterDashboard(data.employee);
-        window.history.replaceState({}, '', window.location.pathname);
-        return true;
-      }
-    } catch {}
-  }
-  return false;
-}
-
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 //  INIT
-// ═══════════════════════════════════════
+// ─────────────────────────────────────────
 async function init() {
-  // Check QR auto-login first
-  if (await checkAutoLogin()) return;
-
-  // Check existing session
   const saved = loadSession();
   if (saved && saved.cedula) {
     try {
-      const data = await api('validateSession', { cedula: saved.cedula });
+      const data = await api('login', { correo: saved.correo, cedula: saved.cedula });
       if (data.ok) { enterDashboard(data.employee); return; }
     } catch {}
   }
 }
 
-// Handle Enter key
 document.addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  const loginVisible = document.getElementById('tab-login').style.display !== 'none';
-  if (loginVisible && document.getElementById('view-auth').style.display !== 'none') doLogin();
+  if (e.key === 'Enter' && document.getElementById('view-auth').style.display !== 'none') doLogin();
 });
 
 init();
